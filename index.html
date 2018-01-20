@@ -4,41 +4,49 @@
 <head>
     <title>title</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://unpkg.com/vue"></script>
-    <script src="https://vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
-    <!-- <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css"> -->
 </head>
 
 <body>
     <div id="app">
-        <h1>{{ message }}</h1>
-        <p>{{ urlParams.access_token }}</p>
+        <button onclick="go()" style="height: 100%;width: 100%;transform: translateX(50%) translateY(50%);">Go!</button>
     </div>
 </body>
 
 <script>
-    var app = new Vue({
-        el: '#app',
-        data: {
-            message: 'Hello Vue!',
-            urlParams: { }
-        },
-        created: function () {
-            var rawParams = document.location.search.substring(1).split('&');
-            rawParams.forEach(rawParam => {
-                this.urlParams[rawParam.split('=')[0]] = rawParam.split('=')[1];
-            });
-        }
+    var vkData = {};
+
+    document.addEventListener('DOMContentLoaded', function () {
+        var rawParameters = document.location.search.substring(1).split('&');
+        rawParameters.forEach(function (rawParam) {
+            this.vkData[rawParam.split('=')[0]] = rawParam.split('=')[1];
+        });
     });
 
-    VK.init(function () {
-        VK.api("wall.get", { "group_id": "Hello!" }, function (data) {
-            alert("Post ID:" + data.response.post_id);
-        });
-    }, function () {
-        // API initialization failed 
-        // Can reload page here 
-    }, '5.69'); 
+    function get(method, params) {
+        var xhr = new XMLHttpRequest();
+
+        params.push('v=5.62');
+        params.push('access_token=' + vkData['access_token']);
+
+        xhr.open('GET', 'https://api.vk.com/method/' + method + '?' + params.join('&'), false);
+        xhr.send();
+        if (xhr.status != 200) {
+            alert(xhr.status + ': ' + xhr.statusText + ' ' + xhr.responseText);
+        } else {
+            return JSON.parse(xhr.responseText);
+        }
+    }
+
+    function random(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function go() {
+        let count = get('wall.get', ['owner_id=-' + vkData['group_id']]).response.count;
+        let post = get('wall.get', ['owner_id=' + vkData['group_id'], 'count=1', 'offset=' + random(0, count)]).response.items[0];
+
+        window.open('https://vk.com/wall-92412705_' + post.id, '_blank');
+    }
 </script>
 
 </html>
