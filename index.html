@@ -43,9 +43,9 @@
 
     function go() {
         let count = get('wall.get', ['owner_id=-' + vkData['group_id']]).response.count;
-        let post = get('wall.get', ['owner_id=' + vkData['group_id'], 'count=1', 'offset=' + random(0, count)]).response.items[0];
+        let post = get('wall.get', ['owner_id=-' + vkData['group_id'], 'count=1', 'offset=' + random(0, count)]).response.items[0];
 
-        window.open('https://vk.com/wall-92412705_' + post.id, '_blank');
+        window.open('https://vk.com/wall-' + vkData['group_id'] + '_' + post.id, '_blank');
     }
 </script>
 
