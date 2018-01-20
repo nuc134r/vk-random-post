@@ -133,7 +133,7 @@
         ];
 
         var callback = function (data) {
-            var offset = random(0, data.response.count);
+            var offset = random(0, data.response.count - 1);
             open_post(offset);
         };
 
