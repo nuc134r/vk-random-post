@@ -8,33 +8,33 @@
 
 <body>
     <div id="app">
-        <button onclick="go()" style="height: 100%;width: 100%;transform: translateX(50%) translateY(50%);">Go!</button>
+        <button onclick="go()">Go!</button>
     </div>
 </body>
 
 <script>
-    var vkData = {};
+    var self = this;
+    var vk_url_params = {};
 
     document.addEventListener('DOMContentLoaded', function () {
-        var rawParameters = document.location.search.substring(1).split('&');
-        rawParameters.forEach(function (rawParam) {
-            this.vkData[rawParam.split('=')[0]] = rawParam.split('=')[1];
+        var raw_params = document.location.search.substring(1).split('&');
+
+        raw_params.forEach(function (rawParam) {
+            vk_url_params[rawParam.split('=')[0]] = rawParam.split('=')[1];
         });
     });
 
-    function get(method, params) {
-        var xhr = new XMLHttpRequest();
+    function vk_jsonp(method, params, callback) {
+        var callbackName = 'jsonp_callback_' + +new Date();
+        self[callbackName] = callback;
 
+        params.push('callback=' + callbackName);
         params.push('v=5.62');
-        params.push('access_token=' + vkData['access_token']);
+        params.push('access_token=' + vk_url_params['access_token']);
 
-        xhr.open('GET', 'https://api.vk.com/method/' + method + '?' + params.join('&'), false);
-        xhr.send();
-        if (xhr.status != 200) {
-            alert(xhr.status + ': ' + xhr.statusText + ' ' + xhr.responseText);
-        } else {
-            return JSON.parse(xhr.responseText);
-        }
+        var elem = document.createElement("script");
+        elem.src = 'https://api.vk.com/method/' + method + '?' + params.join('&');
+        document.head.appendChild(elem);
     }
 
     function random(min, max) {
@@ -42,10 +42,15 @@
     }
 
     function go() {
-        let count = get('wall.get', ['owner_id=-' + vkData['group_id']]).response.count;
-        let post = get('wall.get', ['owner_id=-' + vkData['group_id'], 'count=1', 'offset=' + random(0, count)]).response.items[0];
-
-        window.open('https://vk.com/wall-' + vkData['group_id'] + '_' + post.id, '_blank');
+        vk_jsonp('wall.get', ['owner_id=-' + vk_url_params['group_id']],
+            function (data) {
+                var count = data.response.count;
+                vk_jsonp('wall.get', ['owner_id=-' + vk_url_params['group_id'], 'count=1', 'offset=' + random(0, count)],
+                    function (data) {
+                        var post = data.response.items[0];
+                        window.open('https://vk.com/wall-' + vk_url_params['group_id'] + '_' + post.id, '_blank');
+                    });
+            });
     }
 </script>
 
