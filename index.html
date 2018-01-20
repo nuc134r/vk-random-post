@@ -71,10 +71,12 @@
 
 <body>
     <div class="wrapper">
-        <p>Кнопка ниже откроет случайную запись на стене сообщества <a target="_blank" id="vk_community_link" href=""></a>.
+        <p>Кнопка откроет случайную запись на стене сообщества <a target="_blank" id="vk_community_link" href=""></a>.
         </p>
         <br>
-        <button onclick="open_random_post()" class="flat_button">Открыть</button>
+        <button onclick="open_random_post()" class="flat_button">Открыть случайный пост</button>
+        <br>
+        <p style="color: #828282;">Если вы используете мобильное приложение, то потребуется открыть это приложение в мобильной версии ВКонтакте.</p>
     </div>
 </body>
 
@@ -89,7 +91,9 @@
             vk_url_params[rawParam.split('=')[0]] = rawParam.split('=')[1];
         });
 
-        gather_community_info();
+        var link = document.getElementById("vk_community_link");
+        link.innerHTML = JSON.parse(vk_url_params['api_result']).response[0].name;
+        link.href = 'https://vk.com/club' + vk_url_params['group_id'];
     });
 
     function vk_jsonp(method, params, callback) {
@@ -107,20 +111,6 @@
 
     function random(min, max) {
         return Math.floor(Math.random() * (max - min + 1)) + min;
-    }
-
-    function gather_community_info() {
-        var params = [
-            'group_id=' + vk_url_params['group_id']
-        ];
-
-        var callback = function (data) {
-            var link = document.getElementById("vk_community_link");
-            link.innerHTML = data.response[0].name;
-            link.href = 'https://vk.com/club' + vk_url_params['group_id'];
-        };
-
-        vk_jsonp('groups.getById', params, callback);
     }
 
     function open_random_post() {
