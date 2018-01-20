@@ -7,7 +7,6 @@
 
     <style type="text/css">
         body {
-            background: #edeef0;
             color: #000;
             margin: 0;
             padding: 0;
@@ -40,6 +39,7 @@
             border: 0;
             border-radius: 4px;
             box-sizing: border-box;
+            height: 28px;
         }
 
         .flat_button:hover {
@@ -52,12 +52,27 @@
             padding-top: 8px;
             padding-bottom: 7px;
         }
+
+        .wrapper {
+            padding: 20px;
+        }
+
+        a {
+            color: #2a5885;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
 <body>
-    <div id="app">
-        <p>Кнопка ниже откроет случайную запись на стене этого сообщества.</p>
+    <div class="wrapper">
+        <p>Кнопка ниже откроет случайную запись на стене сообщества <a id="vk_community_link" href=""></a>.
+        </p>
         <br>
         <button onclick="open_random_post()" class="flat_button">Открыть</button>
     </div>
@@ -68,6 +83,8 @@
     var vk_url_params = {};
 
     document.addEventListener('DOMContentLoaded', function () {
+        gather_community_info();
+
         var raw_params = document.location.search.substring(1).split('&');
 
         raw_params.forEach(function (rawParam) {
@@ -92,13 +109,28 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
 
+    function gather_community_info() {
+        var params = [
+            'group_id=' + vk_url_params['group_id']
+        ];
+
+        var callback = function (data) {
+            var link = document.getElementById("vk_community_link");
+            link.innerHTML = data.response.name;
+            link.href = 'https://vk.com/club' + vk_url_params['group_id'];
+        };
+
+        vk_jsonp('groups.getById', params, callback);
+    }
+
     function open_random_post() {
         var params = [
             'owner_id=' + '-' + vk_url_params['group_id']
         ];
 
         var callback = function (data) {
-            open_post(data.response.count);
+            var offset = random(0, data.response.count);
+            open_post(offset);
         };
 
         vk_jsonp('wall.get', params, callback);
