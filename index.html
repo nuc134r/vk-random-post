@@ -70,8 +70,13 @@
 </head>
 
 <body>
-    <div class="wrapper">
-        <p>Кнопка откроет случайную запись на стене сообщества <a target="_blank" id="vk_community_link" href=""></a>.
+    <div class="wrapper" style="display: none;" id="promo_wrapper">
+        <p>Данное приложение открывает случайную запись со стены вашего сообщества.</p>
+        <a href="https://vk.com/add_community_app.php?aid=6336648" class="flat_button">Установить</a>
+    </div>
+    <div class="wrapper" style="display: none;" id="main_wrapper">
+        <p>Кнопка откроет случайную запись на стене сообщества
+            <a target="_blank" id="vk_community_link" href=""></a>.
         </p>
         <button onclick="open_random_post()" class="flat_button">Открыть случайный пост</button>
         <br>
@@ -90,10 +95,20 @@
             vk_url_params[rawParam.split('=')[0]] = rawParam.split('=')[1];
         });
 
-        var link = document.getElementById("vk_community_link");
-        link.innerHTML = JSON.parse(decodeURIComponent(vk_url_params['api_result'])).response[0].name;
-        link.href = 'https://vk.com/club' + vk_url_params['group_id'];
+        initialize();
     });
+
+    function initialize() {
+        if (vk_url_params['group_id']) {
+            var wrapper = document.getElementById("main_wrapper").style.display = "block";
+
+            var link = document.getElementById("vk_community_link");
+            link.innerHTML = JSON.parse(decodeURIComponent(vk_url_params['api_result'])).response[0].name;
+            link.href = 'https://vk.com/club' + vk_url_params['group_id'];
+        } else {
+            var wrapper = document.getElementById("promo_wrapper").style.display = "block";
+        }
+    }
 
     function vk_jsonp(method, params, callback) {
         var callbackName = 'jsonp_callback_' + +new Date();
