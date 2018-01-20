@@ -83,13 +83,13 @@
     var vk_url_params = {};
 
     document.addEventListener('DOMContentLoaded', function () {
-        gather_community_info();
-
         var raw_params = document.location.search.substring(1).split('&');
 
         raw_params.forEach(function (rawParam) {
             vk_url_params[rawParam.split('=')[0]] = rawParam.split('=')[1];
         });
+
+        gather_community_info();
     });
 
     function vk_jsonp(method, params, callback) {
