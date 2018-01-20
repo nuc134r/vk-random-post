@@ -116,7 +116,7 @@
 
         var callback = function (data) {
             var link = document.getElementById("vk_community_link");
-            link.innerHTML = data.response.name;
+            link.innerHTML = data.response[0].name;
             link.href = 'https://vk.com/club' + vk_url_params['group_id'];
         };
 
