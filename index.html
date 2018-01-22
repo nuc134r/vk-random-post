@@ -100,15 +100,18 @@
         initialize();
     });
 
-    VK.init(function () {
-        VK.callMethod("showSettingsBox", 1);
-    }, function () {
-        // API initialization failed 
-        // Can reload page here 
-    }, '5.71');
+
 
     function initialize() {
         if (vk_url_params['group_id']) {
+            if (vk_url_params['api_settings'] < 1) {
+                VK.init(function () {
+                    VK.callMethod("showSettingsBox", 1);
+                }, function () {
+                    
+                }, '5.71');
+            }
+
             var wrapper = document.getElementById("main_wrapper").style.display = "block";
 
             var link = document.getElementById("vk_community_link");
